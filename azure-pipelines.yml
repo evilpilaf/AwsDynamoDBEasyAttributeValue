@@ -15,25 +15,21 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-
-- task: UseDotNet@1
+- task: DotNetCoreInstaller@0
   inputs:
-    packageType: 'sdk'
     version: '2.2.100'
-
+  
 - task: NuGetToolInstaller@0
 
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
   inputs:
-    restoreSolution: '$(solution)'
+    command: 'restore'
+    projects: '$(solutionDir)'
+    feedsToUse: 'select'
+    versioningScheme: 'off'
 
-- task: VSBuild@2
+- task: DotNetCoreCLI@2
   inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: VSTest@3
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    command: 'build'
+    feedsToUse: 'select'
+    versioningScheme: 'off'
