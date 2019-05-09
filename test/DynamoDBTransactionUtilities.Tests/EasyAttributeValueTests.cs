@@ -1,0 +1,54 @@
+using Amazon.DynamoDBv2.Model;
+using FluentAssertions;
+using System;
+using Xunit;
+
+namespace DynamoDBTransactionUtilities.Tests
+{
+    public sealed class EasyAttributeValueTests
+    {
+        [Fact]
+        public void IntValuesAreMappedToNumberType()
+        {
+            const int value = 4;
+            var sut = new EasyAttributeValue(value);
+
+            AttributeValue projection = sut;
+
+            projection.N.Should().Be(value.ToString());
+        }
+
+        [Fact]
+        public void DoubleValuesAreMappedToNumberType()
+        {
+            const double value = 4.0;
+            var sut = new EasyAttributeValue(value);
+
+            AttributeValue projection = sut;
+
+            projection.N.Should().Be(value.ToString());
+        }
+
+        [Fact]
+        public void FloatValuesAreMappedToNumberType()
+        {
+            const float value = 4.0F;
+            var sut = new EasyAttributeValue(value);
+
+            AttributeValue projection = sut;
+
+            projection.N.Should().Be(value.ToString());
+        }
+
+        [Fact]
+        public void DecimalValuesAreMappedToNumberType()
+        {
+            const decimal value = 4.0m;
+            var sut = new EasyAttributeValue(value);
+
+            AttributeValue projection = sut;
+
+            projection.N.Should().Be(value.ToString());
+        }
+    }
+}
