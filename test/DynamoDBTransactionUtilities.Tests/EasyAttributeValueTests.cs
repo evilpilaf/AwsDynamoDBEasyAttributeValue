@@ -96,5 +96,17 @@ namespace DynamoDBTransactionUtilities.Tests
 
             projection.S.Should().Be(value.ToString("o"));
         }
+
+        [Fact]
+        public void DateTimeOffsetValuesAreMappedToISODateString()
+        {
+            var value = DateTimeOffset.UtcNow;
+
+            var sut = new EasyAttributeValue(value);
+
+            AttributeValue projection = sut;
+
+            projection.S.Should().Be(value.ToString("o"));
+        }
     }
 }

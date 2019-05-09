@@ -37,6 +37,11 @@ namespace DynamoDBTransactionUtilities
             _value = new AttributeValue { S = value.ToString("O") };
         }
 
+        public EasyAttributeValue(DateTimeOffset value)
+        {
+            _value = new AttributeValue { S = value.ToString("O") };
+        }
+
         public EasyAttributeValue(bool value)
         {
             _value = new AttributeValue { BOOL = value };
