@@ -72,5 +72,17 @@ namespace DynamoDBTransactionUtilities.Tests
 
             projection.S.Should().BeNull();
         }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void BoolValuesAreMappedToBooleanType(bool value)
+        {
+            var sut = new EasyAttributeValue(value);
+
+            AttributeValue projection = sut;
+
+            projection.BOOL.Should().Be(value);
+        }
     }
 }
