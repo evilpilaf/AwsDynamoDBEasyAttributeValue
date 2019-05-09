@@ -50,5 +50,27 @@ namespace DynamoDBTransactionUtilities.Tests
 
             projection.N.Should().Be(value.ToString());
         }
+
+        [Fact]
+        public void StringValuesAreMappedToStringType()
+        {
+            const string value = nameof(value);
+            var sut = new EasyAttributeValue(value);
+
+            AttributeValue projection = sut;
+
+            projection.S.Should().Be(value);
+        }
+
+        [Fact]
+        public void NullStringsValuesAreMappedToStringType()
+        {
+            const string value = null;
+            var sut = new EasyAttributeValue(value);
+
+            AttributeValue projection = sut;
+
+            projection.S.Should().BeNull();
+        }
     }
 }
