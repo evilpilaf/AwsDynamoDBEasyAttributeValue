@@ -33,8 +33,6 @@ steps:
   displayName: 'Build'
   inputs:
     command: 'build'
-    feedsToUse: 'select'
-    versioningScheme: 'off'
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
@@ -50,6 +48,7 @@ steps:
     arguments: '.\src\DynamoDBTransactionUtilities\ --output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration) --no-build'
 
 - task: PublishBuildArtifacts@1
+  displayName: "Publish build artifacts"
 
 - script: dotnet pack
 - task: NuGetCommand@2
