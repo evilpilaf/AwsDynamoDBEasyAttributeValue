@@ -1,6 +1,8 @@
 using Amazon.DynamoDBv2.Model;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace DynamoDBTransactionUtilities.Tests
@@ -107,6 +109,33 @@ namespace DynamoDBTransactionUtilities.Tests
             AttributeValue projection = sut;
 
             projection.S.Should().Be(value.ToString("o"));
+        }
+
+        [Fact]
+        public void ObjectAttributesAreMappedToMAttribute()
+        {
+            dynamic value = new
+            {
+                NumericValue = 1,
+                StringValue = "StringValue"
+            };
+
+            var values = new Dictionary<string, AttributeValue>
+            {
+                { nameof(value.NumericValue), new EasyAttributeValue(value.NumericValue) },
+                { nameof(value.StringValue), new EasyAttributeValue(value.StringValue) }
+            };
+
+            var sut = EasyAttributeValue.FromProperties(values);
+
+            AttributeValue projection = sut;
+
+            using (new AssertionScope())
+            {
+                projection.IsMSet.Should().BeTrue();
+                projection.M.Should().NotBeNull();
+                projection.M.Should().BeEquivalentTo(values);
+            }
         }
     }
 }

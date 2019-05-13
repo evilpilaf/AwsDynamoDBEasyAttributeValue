@@ -1,5 +1,6 @@
 using Amazon.DynamoDBv2.Model;
 using System;
+using System.Collections.Generic;
 
 namespace DynamoDBTransactionUtilities
 {
@@ -45,6 +46,16 @@ namespace DynamoDBTransactionUtilities
         public EasyAttributeValue(bool value)
         {
             _value = new AttributeValue { BOOL = value };
+        }
+
+        internal EasyAttributeValue(Dictionary<string, AttributeValue> values)
+        {
+            _value = new AttributeValue { M = values };
+        }
+
+        public static EasyAttributeValue FromProperties(Dictionary<string, AttributeValue> values)
+        {
+            return new EasyAttributeValue(values);
         }
 
         public static implicit operator AttributeValue(EasyAttributeValue instance)
