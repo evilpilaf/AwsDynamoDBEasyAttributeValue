@@ -112,7 +112,7 @@ namespace DynamoDBTransactionUtilities.Tests
         }
 
         [Fact]
-        public void ObjectAttributesAreMappedToMAttribute()
+        public void AttributesAreMappedToMAttribute()
         {
             dynamic value = new
             {
@@ -135,6 +135,44 @@ namespace DynamoDBTransactionUtilities.Tests
                 projection.IsMSet.Should().BeTrue();
                 projection.M.Should().NotBeNull();
                 projection.M.Should().BeEquivalentTo(values);
+            }
+        }
+
+        [Fact]
+        public void Object_WithPrimitiveProperties_AreMappedToMAttribute()
+        {
+            dynamic value = new
+            {
+                NumericValue = 1,
+                StringValue = "StringValue",
+                BooleanValue = true,
+                DateTimeValue = DateTime.Now,
+                DateTimeOffsetValue = DateTimeOffset.Now
+            };
+
+            var sut = EasyAttributeValue.FromObject(value);
+
+            AttributeValue projection = sut;
+
+            using (new AssertionScope())
+            {
+                projection.IsMSet.Should().BeTrue();
+                projection.M.Should().NotBeNull();
+
+                projection.M.Should().ContainKey(nameof(value.NumericValue));
+                projection.M[nameof(value.NumericValue)].Should().BeEquivalentTo(new AttributeValue { N = value.NumericValue.ToString() });
+
+                projection.M.Should().ContainKey(nameof(value.StringValue));
+                projection.M[nameof(value.StringValue)].Should().BeEquivalentTo(new AttributeValue { S = value.StringValue });
+
+                projection.M.Should().ContainKey(nameof(value.BooleanValue));
+                projection.M[nameof(value.BooleanValue)].Should().BeEquivalentTo(new AttributeValue { BOOL = value.BooleanValue });
+
+                projection.M.Should().ContainKey(nameof(value.DateTimeValue));
+                projection.M[nameof(value.DateTimeValue)].Should().BeEquivalentTo(new AttributeValue { S = value.DateTimeValue.ToString("O") });
+
+                projection.M.Should().ContainKey(nameof(value.DateTimeOffsetValue));
+                projection.M[nameof(value.DateTimeOffsetValue)].Should().BeEquivalentTo(new AttributeValue { S = value.DateTimeOffsetValue.ToString("O") });
             }
         }
     }
