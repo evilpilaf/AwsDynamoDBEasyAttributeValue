@@ -175,5 +175,50 @@ namespace DynamoDBTransactionUtilities.Tests
                 projection.M[nameof(value.DateTimeOffsetValue)].Should().BeEquivalentTo(new AttributeValue { S = value.DateTimeOffsetValue.ToString("O") });
             }
         }
+
+        [Fact]
+        public void Object_WithNestedObject_MappedToMAttribute()
+        {
+            var value = new
+            {
+                NestedValue = new
+                {
+                    NumericValue = 1,
+                    StringValue = "StringValue",
+                    BooleanValue = true,
+                    DateTimeValue = DateTime.Now,
+                    DateTimeOffsetValue = DateTimeOffset.Now
+                }
+            };
+
+            var sut = EasyAttributeValue.FromObject(value);
+
+            AttributeValue projection = sut;
+
+            using (new AssertionScope())
+            {
+                projection.IsMSet.Should().BeTrue();
+                projection.M.Should().NotBeNull();
+
+                projection.M.Should().ContainKey(nameof(value.NestedValue));
+
+                var nestedAttribute = projection.M[nameof(value.NestedValue)];
+
+                nestedAttribute.M.Should().ContainKey(nameof(value.NestedValue.NumericValue));
+                nestedAttribute.M[nameof(value.NestedValue.NumericValue)].Should().BeEquivalentTo(new AttributeValue { N = value.NestedValue.NumericValue.ToString() });
+
+                nestedAttribute.M.Should().ContainKey(nameof(value.NestedValue.StringValue));
+                nestedAttribute.M[nameof(value.NestedValue.StringValue)].Should().BeEquivalentTo(new AttributeValue { S = value.NestedValue.StringValue });
+
+                nestedAttribute.M.Should().ContainKey(nameof(value.NestedValue.BooleanValue));
+                nestedAttribute.M[nameof(value.NestedValue.BooleanValue)].Should().BeEquivalentTo(new AttributeValue { BOOL = value.NestedValue.BooleanValue });
+
+                nestedAttribute.M.Should().ContainKey(nameof(value.NestedValue.DateTimeValue));
+                nestedAttribute.M[nameof(value.NestedValue.DateTimeValue)].Should().BeEquivalentTo(new AttributeValue { S = value.NestedValue.DateTimeValue.ToString("O") });
+
+                nestedAttribute.M.Should().ContainKey(nameof(value.NestedValue.DateTimeOffsetValue));
+                nestedAttribute.M[nameof(value.NestedValue.DateTimeOffsetValue)].Should().BeEquivalentTo(new AttributeValue { S = value.NestedValue.DateTimeOffsetValue.ToString("O") });
+            }
+        }
     }
 }

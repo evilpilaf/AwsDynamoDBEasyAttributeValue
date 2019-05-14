@@ -62,7 +62,7 @@ namespace DynamoDBTransactionUtilities
         public static EasyAttributeValue FromObject<T>(T obj) where T : class
         {
             var classProperties = new Dictionary<string, AttributeValue>();
-            var objectProperties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var objectProperties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
             foreach (var property in objectProperties)
             {
@@ -71,34 +71,41 @@ namespace DynamoDBTransactionUtilities
 
                 var type = value.GetType();
 
-                switch (value)
+                if (type.IsClass && type != typeof(string))
                 {
-                    case int v:
-                        attributeValue = new EasyAttributeValue(v);
-                        break;
-                    case float v:
-                        attributeValue = new EasyAttributeValue(v);
-                        break;
-                    case double v:
-                        attributeValue = new EasyAttributeValue(v);
-                        break;
-                    case string v:
-                        attributeValue = new EasyAttributeValue(v);
-                        break;
-                    case decimal v:
-                        attributeValue = new EasyAttributeValue(v);
-                        break;
-                    case bool v:
-                        attributeValue = new EasyAttributeValue(v);
-                        break;
-                    case DateTime v:
-                        attributeValue = new EasyAttributeValue(v);
-                        break;
-                    case DateTimeOffset v:
-                        attributeValue = new EasyAttributeValue(v);
-                        break;
-                    default:
-                        throw new Exception();
+                    attributeValue = FromObject(value);
+                }
+                else
+                {
+                    switch (value)
+                    {
+                        case int v:
+                            attributeValue = new EasyAttributeValue(v);
+                            break;
+                        case float v:
+                            attributeValue = new EasyAttributeValue(v);
+                            break;
+                        case double v:
+                            attributeValue = new EasyAttributeValue(v);
+                            break;
+                        case string v:
+                            attributeValue = new EasyAttributeValue(v);
+                            break;
+                        case decimal v:
+                            attributeValue = new EasyAttributeValue(v);
+                            break;
+                        case bool v:
+                            attributeValue = new EasyAttributeValue(v);
+                            break;
+                        case DateTime v:
+                            attributeValue = new EasyAttributeValue(v);
+                            break;
+                        case DateTimeOffset v:
+                            attributeValue = new EasyAttributeValue(v);
+                            break;
+                        default:
+                            throw new Exception();
+                    }
                 }
                 classProperties.Add(property.Name, attributeValue);
             }
