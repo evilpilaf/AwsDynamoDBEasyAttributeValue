@@ -5,6 +5,8 @@
     <Authors>Evil Pilaf</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Version>0.1.0</Version>
+    <PackageTags>DynamoDB;AWS;DynamoDBv2;AttributeValue</PackageTags>
+    <RepositoryURL>https://github.com/evilpilaf/AwsDynamoDBEasyAttributeValue</RepositoryURL>
   </PropertyGroup>
 
   <ItemGroup>
