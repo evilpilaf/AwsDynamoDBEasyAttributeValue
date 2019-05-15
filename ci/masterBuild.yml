@@ -11,7 +11,7 @@ trigger:
 variables:
   solution: 'DynamoDBTransactionUtilities.sln'
   buildConfiguration: 'Release'
-  isPullRequest: startsWith(variables['Build.SourceBranch'], 'refs/pull')
+  isPullRequest: in(variables['Build.Reason'], 'PullRequest')
 
 jobs:
   - job: Build_and_Test
