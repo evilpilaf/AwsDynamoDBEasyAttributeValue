@@ -3,6 +3,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace DynamoDBTransactionUtilities.Tests
@@ -218,6 +219,46 @@ namespace DynamoDBTransactionUtilities.Tests
 
                 nestedAttribute.M.Should().ContainKey(nameof(value.NestedValue.DateTimeOffsetValue));
                 nestedAttribute.M[nameof(value.NestedValue.DateTimeOffsetValue)].Should().BeEquivalentTo(new AttributeValue { S = value.NestedValue.DateTimeOffsetValue.ToString("O") });
+            }
+        }
+
+        [Fact]
+        public void Collection_OfPrimitiveValues_MapsToLAttribute()
+        {
+            var lst = Enumerable.Range(1, 2);
+
+            AttributeValue sut = EasyAttributeValue.FromCollection(lst);
+
+            var expectedValues = lst.Select(v => new AttributeValue { N = v.ToString() });
+            using (new AssertionScope())
+            {
+                sut.L.Should().HaveCount(lst.Count());
+                sut.L.Should().BeEquivalentTo(expectedValues);
+            }
+        }
+
+        [Fact]
+        public void Collection_OfObjects_MapsToLAttribute()
+        {
+            var lst = new[] { new { MyValue = "Value" } };
+
+            AttributeValue sut = EasyAttributeValue.FromCollection(lst);
+
+            var expectedValue = new[]
+            {
+                new AttributeValue
+                {
+                    M = new Dictionary<string, AttributeValue>
+                    {
+                        { "MyValue", new AttributeValue { S = "Value" } }
+                    }
+                }
+            };
+
+            using (new AssertionScope())
+            {
+                sut.L.Should().HaveCount(lst.Count());
+                sut.L.Should().BeEquivalentTo(expectedValue);
             }
         }
     }
