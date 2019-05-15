@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <PackageName>DynamoDBEasyAttributeValue</PackageName>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Evil Pilaf</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

@@ -14,53 +14,60 @@ pool:
 variables:
   solution: 'DynamoDBTransactionUtilities.sln'
   buildConfiguration: 'Release'
+  isPullRequest: startsWith(variables['Build.SourceBranch'], 'refs/pull')
 
-steps:
-- task: DotNetCoreInstaller@0
-  displayName: 'Install dotnet core'
-  inputs:
-    version: '2.2.100'
+jobs:
+  - job: Build+Test
+    steps:
+    - task: DotNetCoreInstaller@0
+      displayName: 'Install dotnet core'
+      inputs:
+        version: '2.2.100'
 
-- task: NuGetToolInstaller@0
-  displayName: 'Nuget Tool installer'
+    - task: NuGetToolInstaller@0
+      displayName: 'Nuget Tool installer'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Restore'
-  inputs:
-    command: 'restore'
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore'
+      inputs:
+        command: 'restore'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Build'
-  inputs:
-    command: 'build'
-    arguments: '--configuration $(buildConfiguration)'
+    - task: DotNetCoreCLI@2
+      displayName: 'Build'
+      inputs:
+        command: 'build'
+        arguments: '--configuration $(buildConfiguration)'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Test'
-  inputs:
-    command: 'test'
-    arguments: '--configuration $(buildConfiguration) --collect "Code coverage" --no-build'
+    - task: DotNetCoreCLI@2
+      displayName: 'Test'
+      inputs:
+        command: 'test'
+        arguments: '--configuration $(buildConfiguration) --collect "Code coverage" --no-build'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Publish'
-  inputs:
-    command: 'publish'
-    projects: 'src/**/*.csproj'
-    publishWebProjects: False
-    arguments: '--output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration) --no-build'
+  - job: Publish
+    dependsOn: Build+Test
+    condition: not($(isPullRequest))
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish'
+      inputs:
+        command: 'publish'
+        projects: 'src/**/*.csproj'
+        publishWebProjects: False
+        arguments: '--output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration) --no-build'
 
-- task: PublishBuildArtifacts@1
-  displayName: "Publish build artifacts"
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish build artifacts"
 
-- task: DotNetCoreCLI@2
-  displayName: 'Package'
-  inputs:
-    command: 'pack'
-    arguments: '--output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration) --no-build'
+    - task: DotNetCoreCLI@2
+      displayName: 'Package'
+      inputs:
+        command: 'pack'
+        arguments: '--output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration) --no-build'
 
-- task: NuGetCommand@2
-  inputs:
-    command: push
-    nuGetFeedType: external
-    publishFeedCredentials: 'NuGetFeed'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg' # Required when command == Push
+    - task: NuGetCommand@2
+      inputs:
+        command: push
+        nuGetFeedType: external
+        publishFeedCredentials: 'NuGetFeed'
+        packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg' # Required when command == Push
