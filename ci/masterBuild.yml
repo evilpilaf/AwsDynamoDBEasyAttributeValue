@@ -14,7 +14,7 @@ variables:
   isPullRequest: startsWith(variables['Build.SourceBranch'], 'refs/pull')
 
 jobs:
-  - job: Build+Test
+  - job: Build_and_Test
     pool:
       vmImage: 'windows-latest'
     steps:
@@ -46,7 +46,7 @@ jobs:
   - job: Publish
     pool:
       vmImage: 'windows-latest'
-    dependsOn: Build+Test
+    dependsOn: Build_and_Test
     condition: not(variables['isPullRequest'])
     steps:
     - task: DotNetCoreCLI@2
