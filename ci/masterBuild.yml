@@ -47,7 +47,7 @@ jobs:
     pool:
       vmImage: 'windows-latest'
     dependsOn: Build+Test
-    condition: not($(isPullRequest))
+    condition: not(variables['isPullRequest'])
     steps:
     - task: DotNetCoreCLI@2
       displayName: 'Publish'
