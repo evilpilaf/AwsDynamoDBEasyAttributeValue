@@ -8,9 +8,6 @@ trigger:
     include:
     - master
 
-pool:
-  vmImage: 'windows-latest'
-
 variables:
   solution: 'DynamoDBTransactionUtilities.sln'
   buildConfiguration: 'Release'
@@ -18,6 +15,8 @@ variables:
 
 jobs:
   - job: Build+Test
+    pool:
+      vmImage: 'windows-latest'
     steps:
     - task: DotNetCoreInstaller@0
       displayName: 'Install dotnet core'
@@ -45,6 +44,8 @@ jobs:
         arguments: '--configuration $(buildConfiguration) --collect "Code coverage" --no-build'
 
   - job: Publish
+    pool:
+      vmImage: 'windows-latest'
     dependsOn: Build+Test
     condition: not($(isPullRequest))
     steps:
