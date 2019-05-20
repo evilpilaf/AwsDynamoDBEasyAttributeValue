@@ -11,7 +11,6 @@ trigger:
 variables:
   solution: 'DynamoDBTransactionUtilities.sln'
   buildConfiguration: 'Release'
-  isPullRequest: in(variables['Build.Reason'], 'PullRequest')
 
 jobs:
   - job: Build_and_Test
@@ -47,7 +46,7 @@ jobs:
     pool:
       vmImage: 'windows-latest'
     dependsOn: Build_and_Test
-    condition: not(variables['isPullRequest'])
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     steps:
     - task: DotNetCoreCLI@2
       displayName: 'Publish'
@@ -57,18 +56,14 @@ jobs:
         publishWebProjects: False
         arguments: '--output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration) --no-build'
 
-    - task: PublishBuildArtifacts@1
-      displayName: "Publish build artifacts"
-
     - task: DotNetCoreCLI@2
       displayName: 'Package'
       inputs:
         command: 'pack'
         arguments: '--output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration) --no-build'
 
-    - task: NuGetCommand@2
+    - task: PublishBuildArtifacts@1
       inputs:
-        command: push
-        nuGetFeedType: external
-        publishFeedCredentials: 'NuGetFeed'
-        packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg' # Required when command == Push
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
