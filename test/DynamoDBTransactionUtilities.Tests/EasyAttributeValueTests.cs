@@ -1,10 +1,11 @@
 using Amazon.DynamoDBv2.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Xunit;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xunit;
 
 namespace DynamoDBTransactionUtilities.Tests
 {
@@ -260,6 +261,43 @@ namespace DynamoDBTransactionUtilities.Tests
                 sut.L.Should().HaveCount(lst.Count());
                 sut.L.Should().BeEquivalentTo(expectedValue);
             }
+        }
+
+        [Fact]
+        public void Enum_GetsParsedAs_StringValue()
+        {
+            var val = MyEnum.EnumValue;
+
+            AttributeValue sut = new EasyAttributeValue(val);
+
+            sut.S.Should().Be(Enum.GetName(typeof(MyEnum), val));
+        }
+
+        [Fact]
+        public void Object_WithEnumProperty_MapsEnumProperty()
+        {
+            var value = new
+            {
+                NestedEnum = MyEnum.EnumValue
+            };
+
+            AttributeValue sut = EasyAttributeValue.FromObject(value);
+
+            using (new AssertionScope())
+            {
+                sut.IsMSet.Should().BeTrue();
+                sut.M.Should().NotBeNull();
+
+                sut.M.Should().ContainKey(nameof(value.NestedEnum));
+
+                var nestedAttribute = sut.M[nameof(value.NestedEnum)];
+                nestedAttribute.S.Should().Be(Enum.GetName(typeof(MyEnum), value.NestedEnum));
+            }
+        }
+
+        private enum MyEnum
+        {
+            EnumValue
         }
     }
 }
