@@ -78,7 +78,7 @@ namespace DynamoDBTransactionUtilities
             var objectType = obj.GetType();
             EasyAttributeValue attributeValue;
 
-            if (IsEnumeration(objectType))
+            if (IsEnumerable(objectType))
             {
                 attributeValue = FromClass(obj);
             }
@@ -105,7 +105,7 @@ namespace DynamoDBTransactionUtilities
 
                 var type = value.GetType();
 
-                if (IsEnumeration(type))
+                if (IsEnumerable(type))
                 {
                     attributeValue = FromCollection(value as IEnumerable<object>);
                 }
@@ -171,7 +171,7 @@ namespace DynamoDBTransactionUtilities
         private static bool IsClass(Type type) =>
             type.IsClass && type != typeof(string);
 
-        private static bool IsEnumeration(Type type) =>
+        private static bool IsEnumerable(Type type) =>
             type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
     }
 }
