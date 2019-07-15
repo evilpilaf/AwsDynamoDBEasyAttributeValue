@@ -1,10 +1,8 @@
+using McMaster.Extensions.CommandLineUtils;
+
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using McMaster.Extensions.CommandLineUtils;
 
 using static Bullseye.Targets;
 using static SimpleExec.Command;
@@ -20,7 +18,7 @@ namespace Build
         private const string Test = nameof(Test);
         private const string Pack = nameof(Pack);
 
-        public static void Main(string[] args)
+        public static void Main2(string[] args)
         {
             var app = new CommandLineApplication(throwOnUnexpectedArg: false);
 
